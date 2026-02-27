@@ -59,40 +59,63 @@ export class ModelsMesh<T extends AllModels> {
 }
 
 export class VertexModel extends ModelsMesh<Vertex> {
-    constructor(name: string, geometry: THREE.BufferGeometry, shader: THREE.RawShaderMaterial, params: Vertex) {
-        super(name, geometry, shader, params);
-        this.buildGUI(); // Llamamos a su propio constructor de UI
-    }
+  constructor(name: string, geometry: THREE.BufferGeometry, shader: THREE.RawShaderMaterial, params: Vertex) {
+      super(name, geometry, shader, params);
+      this.buildGUI(); // Llamamos a su propio constructor de UI
+  }
 
-    protected buildGUI(): void {
-        const atributoColor = this.malla.getAttribute('color') as THREE.BufferAttribute;
+  protected buildGUI(): void {
+    const atributoColor = this.malla.getAttribute('color') as THREE.BufferAttribute;
 
-        const actualizarColorVertice = (indiceVertice: number, hex: string) => {
-            const color = new THREE.Color(hex);
-            atributoColor.setXYZ(indiceVertice, color.r, color.g, color.b);
-            atributoColor.needsUpdate = true; 
-        };
+    const actualizarColorVertice = (indiceVertice: number, hex: string) => {
+        const color = new THREE.Color(hex);
+        atributoColor.setXYZ(indiceVertice, color.r, color.g, color.b);
+        atributoColor.needsUpdate = true; 
+    };
 
-        this.carpetaGUI.addColor(this.parametros, 'colorV0').onChange((nuevoHex: ColorHex) => actualizarColorVertice(0, nuevoHex));
-        this.carpetaGUI.addColor(this.parametros, 'colorV1').onChange((nuevoHex: ColorHex) => actualizarColorVertice(1, nuevoHex));
-        this.carpetaGUI.addColor(this.parametros, 'colorV2').onChange((nuevoHex: ColorHex) => actualizarColorVertice(2, nuevoHex));
+    this.carpetaGUI.addColor(this.parametros, 'colorV0').onChange((nuevoHex: ColorHex) => actualizarColorVertice(0, nuevoHex));
+    this.carpetaGUI.addColor(this.parametros, 'colorV1').onChange((nuevoHex: ColorHex) => actualizarColorVertice(1, nuevoHex));
+    this.carpetaGUI.addColor(this.parametros, 'colorV2').onChange((nuevoHex: ColorHex) => actualizarColorVertice(2, nuevoHex));
 
-        console.log('Construyendo modelo tipo vertex limpio y sin ifs');
-    }
+    console.log('Construyendo modelo tipo vertex limpio y sin ifs');
+  }
 }
 
 export class FragmentModel extends ModelsMesh<Fragment> {
   constructor(name: string, geometry: THREE.BufferGeometry, shader: THREE.RawShaderMaterial, params: Fragment) {
-      super(name, geometry, shader, params);
-      this.buildGUI();
+    super(name, geometry, shader, params);
+    
+    this.buildGUI();
+
   }
 
   protected buildGUI(): void {
-      // Aquí irá la lógica para cuando uses uniforms en el fragment shader
-      this.carpetaGUI.addColor(this.parametros, 'color').onChange((nuevoHex: ColorHex) => {
-           // this.material.uniforms.uColor.value.set(nuevoHex);
-      });
-      console.log('Construyendo modelo tipo fragment');
+    // Aquí irá la lógica para cuando uses uniforms en el fragment shader
+    const atributoColor = this.malla.getAttribute('color') as THREE.BufferAttribute;
+    const actualizarColorVertice = (indiceVertice: number, hex: string) => {
+      const color = new THREE.Color(hex);
+      atributoColor.setXYZ(indiceVertice, color.r, color.g, color.b);
+      atributoColor.needsUpdate = true; 
+    };
+
+    this.carpetaGUI.addColor(this.parametros, 'color').onChange((nuevoHex: ColorHex) => {
+      this.material.uniforms.uObjectColor.value.set(nuevoHex);
+    });
+
+    this.carpetaGUI.add(this.parametros, 'LightPos', 0, 10).onChange((nuevoValor: number) => {
+      this.material.uniforms.uLightPos.value.set(0, 0, nuevoValor);
+    });
+
+    this.carpetaGUI.add(this.parametros, 'ViewPos', 0, 10).onChange((nuevoValor: number) => {
+      this.material.uniforms.uViewPos.value.set(0, 0, nuevoValor);
+    });
+
+    this.carpetaGUI.add(this.parametros, 'Shininess', 1, 256).onChange((nuevoValor: number) => {
+      this.material.uniforms.uShininess.value = nuevoValor;
+    });
+
+
+    console.log('Construyendo modelo tipo fragment');
   }
 }
 

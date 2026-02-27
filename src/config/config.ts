@@ -32,7 +32,7 @@ export function config() {
     controls.minDistance = 2;
     controls.maxDistance = 20;
 
-    const luz = new THREE.DirectionalLight(0xffffff, 1);
-    luz.position.set(2, 2, 5);
-    scene.add(luz, new THREE.AmbientLight(0xffffff, 0.2));
+    //const luz = new THREE.DirectionalLight(0xffffff, 1);
+    //luz.position.set(2, 2, 5);
+    //scene.add(luz, new THREE.AmbientLight(0xffffff, 0.2));
 }
