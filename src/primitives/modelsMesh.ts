@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { scene } from '../config/config';
 import {AllModels,Vertex, Fragment, ColorHex} from './models';
+import { color, positionGeometry } from 'three/tsl';
 
 const gui = new GUI();
 gui.title('Controles del Modelo');
@@ -91,30 +92,40 @@ export class FragmentModel extends ModelsMesh<Fragment> {
 
   protected buildGUI(): void {
     // Aquí irá la lógica para cuando uses uniforms en el fragment shader
-    const atributoColor = this.malla.getAttribute('color') as THREE.BufferAttribute;
-    const actualizarColorVertice = (indiceVertice: number, hex: string) => {
-      const color = new THREE.Color(hex);
-      atributoColor.setXYZ(indiceVertice, color.r, color.g, color.b);
-      atributoColor.needsUpdate = true; 
+    const controlesLuz = {
+        brillo: 32.0,
+        luzX: 2.0,
+        luzY: 2.0,
+        luzZ: 5.0
     };
+    const scale = this.malla.getAttribute('scale') as THREE.BufferAttribute;
 
-    this.carpetaGUI.addColor(this.parametros, 'color').onChange((nuevoHex: ColorHex) => {
+    this.carpetaGUI.addColor(this.parametros, 'color').name("Color").onChange((nuevoHex: ColorHex) => {
       this.material.uniforms.uObjectColor.value.set(nuevoHex);
     });
 
-    this.carpetaGUI.add(this.parametros, 'LightPos', 0, 10).onChange((nuevoValor: number) => {
-      this.material.uniforms.uLightPos.value.set(0, 0, nuevoValor);
+    this.carpetaGUI.add(this.parametros, 'scale', 0.1, 5.0).name('Escala Global').onChange((v: number) => {
+      // scale.set(x, y, z) escala uniformemente en todos los ejes
+      this.objeto.scale.set(v, v, v);
     });
 
-    this.carpetaGUI.add(this.parametros, 'ViewPos', 0, 10).onChange((nuevoValor: number) => {
-      this.material.uniforms.uViewPos.value.set(0, 0, nuevoValor);
+    this.carpetaGUI.add(controlesLuz, 'brillo', 1, 256).name('Shininess').onChange((v: number) => {
+        this.material.uniforms.uShininess.value = v; // ¡Actualizamos la GPU!
     });
 
-    this.carpetaGUI.add(this.parametros, 'Shininess', 1, 256).onChange((nuevoValor: number) => {
-      this.material.uniforms.uShininess.value = nuevoValor;
+    const carpetaLuz = this.carpetaGUI.addFolder('Posición de la Luz');
+    carpetaLuz.add(controlesLuz, 'luzX', -10, 10, 1).onChange((v: number) => this.material.uniforms.uLightPos.value.x = v);
+    carpetaLuz.add(controlesLuz, 'luzY', -10, 10, 1).onChange((v: number) => this.material.uniforms.uLightPos.value.y = v);
+    carpetaLuz.add(controlesLuz, 'luzZ', -10, 10, 1).onChange((v: number) => this.material.uniforms.uLightPos.value.z = v);
+    
+    const carpetaLuzColor = this.carpetaGUI.addFolder('Color de la Luz');
+    carpetaLuzColor.addColor({ color: '#ffffff' }, 'color').name('Color de la Luz').onChange((nuevoHex: ColorHex) => {
+        this.material.uniforms.uLightColor.value.set(nuevoHex);
     });
 
-
+    carpetaLuzColor.addColor({ color: '#ffffff' }, 'color').name('Color del Especular').onChange((nuevoHex: ColorHex) => {
+        this.material.uniforms.uSpecularColor.value.set(nuevoHex);
+    });
     console.log('Construyendo modelo tipo fragment');
   }
 }

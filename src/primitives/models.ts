@@ -12,9 +12,9 @@ export interface Vertex{
 
 export interface Fragment{
     type: 'fragment';
+    scale: number;
     color: ColorHex;
-    LightPos: number;
-    ViewPos: number;
+    colorSpecular: ColorHex;
     LightColor: ColorHex;
     ObjectColor: ColorHex;
     Shininess: number

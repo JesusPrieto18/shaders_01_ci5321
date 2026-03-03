@@ -4,6 +4,7 @@ uniform vec3 uLightPos;
 uniform vec3 uViewPos;   // Posición de la cámara
 uniform vec3 uLightColor;
 uniform vec3 uObjectColor; // El color base del material
+uniform vec3 uSpecularColor; // NUEVO: El color específico del brillo
 uniform float uShininess;  // Qué tan pulido es el objeto (ej. 32.0)
 
 in vec3 vNormal;
@@ -42,7 +43,7 @@ void main() {
     vec3 H = normalize(L + V);
     // Calculamos el alineamiento de H con la Normal, y lo elevamos a la potencia Shininess
     float spec = pow(max(dot(N, H), 0.0), uShininess);
-    vec3 specular = spec * uLightColor; // La luz especular suele tomar el color de la luz, no del objeto
+    vec3 specular = spec * uSpecularColor; // La luz especular toma el color del objeto
 
     // RESULTADO FINAL: Sumamos las 3 luces y multiplicamos por el color del objeto
     vec3 finalLight = (ambient + diffuse + specular);
