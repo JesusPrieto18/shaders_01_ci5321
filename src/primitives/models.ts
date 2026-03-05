@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export type AllModels = Vertex | Fragment;
+export type AllModels = Vertex | Fragment | VertexWave 
 export type ColorHex = string;
 
 export interface Vertex{
@@ -18,4 +18,14 @@ export interface Fragment{
     LightColor: ColorHex;
     ObjectColor: ColorHex;
     Shininess: number
+}
+
+export interface VertexWave {
+    type: 'vertexWave';
+    colorV0: ColorHex;
+    colorV1: ColorHex;
+    colorV2: ColorHex;
+    hardness: number;
+    smoothness: number;
+    time: number;
 }

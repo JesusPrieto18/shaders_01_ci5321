@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { scene } from '../config/config';
-import {AllModels,Vertex, Fragment, ColorHex} from './models';
+import {AllModels,Vertex, Fragment, ColorHex, VertexWave} from './models';
 
 const gui = new GUI();
 gui.title('Controles del Modelo');
@@ -138,6 +138,56 @@ export function changeModel(nuevoIndice: number) {
   }
 }
 
+
+
+// Nueva clase para Vertex Wave
+export class VertexWaveModel extends ModelsMesh<VertexWave> {
+    constructor(name: string, geometry: THREE.BufferGeometry, shader: THREE.RawShaderMaterial, params: VertexWave) {
+        super(name, geometry, shader, params);
+        this.buildGUI();
+    }
+
+    protected buildGUI(): void {
+        const atributoColor = this.malla.getAttribute('color') as THREE.BufferAttribute;
+
+        const actualizarColorVertice = (indiceVertice: number, hex: string) => {
+            const color = new THREE.Color(hex);
+            atributoColor.setXYZ(indiceVertice, color.r, color.g, color.b);
+            atributoColor.needsUpdate = true;
+        };
+
+        this.carpetaGUI.addColor(this.parametros, 'colorV0').onChange((nuevoHex: ColorHex) => actualizarColorVertice(0, nuevoHex));
+        this.carpetaGUI.addColor(this.parametros, 'colorV1').onChange((nuevoHex: ColorHex) => actualizarColorVertice(1, nuevoHex));
+        this.carpetaGUI.addColor(this.parametros, 'colorV2').onChange((nuevoHex: ColorHex) => actualizarColorVertice(2, nuevoHex));
+        // Controles para parámetros del shader
+        const shaderFolder = this.carpetaGUI.addFolder('Parámetros Vertex Wave');
+        
+        shaderFolder.add(this.parametros, 'smoothness', 0.5, 3.0)
+            .name('Suavidad')
+            .step(0.1)
+            .onChange((nuevoValor: number) => {
+                this.material.uniforms.uSmoothness.value = nuevoValor;
+            });
+        
+        shaderFolder.add(this.parametros, 'hardness', 0.2, 2.0)
+            .name('Dureza')
+            .step(0.01)
+            .onChange((nuevoValor: number) => {
+                this.material.uniforms.uHardness.value = nuevoValor;
+            });
+        
+        // El tiempo se actualiza automáticamente en el loop de animación
+        // Pero podemos mostrar su valor actual (solo lectura)
+        shaderFolder.add(this.parametros, 'time')
+            .name('Tiempo')
+            .disable(); // Solo lectura
+        
+        shaderFolder.open();
+
+        console.log('Construyendo modelo Vertex Wave');
+    }
+}
+
 export function addModel(nombre: string, geometria: THREE.BufferGeometry, shader: THREE.RawShaderMaterial, parametros: AllModels) {
   let model: ModelsMesh<any>;  
 
@@ -145,6 +195,8 @@ export function addModel(nombre: string, geometria: THREE.BufferGeometry, shader
       model = new VertexModel(nombre, geometria, shader, parametros);
   } else if (parametros.type === 'fragment') {
       model = new FragmentModel(nombre, geometria, shader, parametros);
+  } else if (parametros.type === 'vertexWave') {
+      model = new VertexWaveModel(nombre, geometria, shader, parametros);  
   } else {
       throw new Error("Tipo de modelo no soportado");
   }
