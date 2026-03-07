@@ -12,6 +12,11 @@ export interface Vertex{
 
 export interface Fragment{
     type: 'fragment';
+    
+    luzX: number;
+    luzY: number;
+    luzZ: number;
+
     scale: number;
     colorSpecular: ColorHex;
     lightColor: ColorHex;
@@ -24,6 +29,10 @@ export interface Toon{
     scale: number;
     colorObject: ColorHex;
     
+    luzX: number;
+    luzY: number;
+    luzZ: number;
+
     stepHigh: number;
     stepMid: number;
     stepLow: number;
@@ -31,8 +40,12 @@ export interface Toon{
     colorHigh: ColorHex; 
     colorMid: ColorHex;
     colorLow: ColorHex;
-                
+
+    softness: number;   
     specularColor: ColorHex; 
     shininess: number;
     specularStep: number;
+
+    outlineThickness: number;
+    outlineColor: ColorHex;
 }

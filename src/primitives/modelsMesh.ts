@@ -4,6 +4,7 @@ import { scene } from '../config/config';
 import {AllModels,Vertex, Fragment, ColorHex, Toon} from './models';
 import { color, positionGeometry } from 'three/tsl';
 import { TGALoader } from 'three/examples/jsm/Addons.js';
+import { outline } from 'three/examples/jsm/tsl/display/OutlineNode.js';
 
 const gui = new GUI();
 gui.title('Controles del Modelo');
@@ -32,6 +33,7 @@ export class ModelsMesh<T extends AllModels> {
         this.mesh = geometry; // Si es un Group, lo usamos directamente
     }
 
+    //this.shader.uniforms.modelMatrix.value = this.mesh.matrixWorld;
     // 2. Parámetros expuestos a la UI
 
 
@@ -88,12 +90,6 @@ export class FragmentModel extends ModelsMesh<Fragment> {
 
   protected buildGUI(): void {
     // Aquí irá la lógica para cuando uses uniforms en el fragment shader
-    const controlesLuz = {
-        brillo: 32.0,
-        luzX: 2.0,
-        luzY: 2.0,
-        luzZ: 5.0
-    };
 
     this.fileGUI.addColor(this.parameters, 'meshColor').name("Color").onChange((nuevoHex: ColorHex) => {
       this.shader.uniforms.uObjectColor.value.set(nuevoHex);
@@ -104,14 +100,14 @@ export class FragmentModel extends ModelsMesh<Fragment> {
       this.mesh.scale.set(v, v, v);
     });
 
-    this.fileGUI.add(controlesLuz, 'brillo', 1, 256).name('Shininess').onChange((v: number) => {
+    this.fileGUI.add(this.parameters, 'shininess', 1, 256).name('Shininess').onChange((v: number) => {
         this.shader.uniforms.uShininess.value = v; // ¡Actualizamos la GPU!
     });
 
     const carpetaLuz = this.fileGUI.addFolder('Posición de la Luz');
-    carpetaLuz.add(controlesLuz, 'luzX', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.x = v);
-    carpetaLuz.add(controlesLuz, 'luzY', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.y = v);
-    carpetaLuz.add(controlesLuz, 'luzZ', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.z = v);
+    carpetaLuz.add(this.parameters, 'luzX', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.x = v);
+    carpetaLuz.add(this.parameters, 'luzY', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.y = v);
+    carpetaLuz.add(this.parameters, 'luzZ', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.z = v);
     
     const carpetaLuzColor = this.fileGUI.addFolder('Color de la Luz');
     carpetaLuzColor.addColor({ color: '#ffffff' }, 'color').name('Color de la Luz').onChange((nuevoHex: ColorHex) => {
@@ -128,28 +124,12 @@ export class FragmentModel extends ModelsMesh<Fragment> {
 export class ToonModel extends ModelsMesh<Toon> {
   constructor(name: string, geometry: THREE.BufferGeometry | THREE.Group, shader: THREE.RawShaderMaterial, params: Toon) {
     super(name, geometry, shader, params);
+    this.mesh.name = "toon"
     this.buildGUI();
 
   }
 
   protected buildGUI(): void {
-    // Aquí irá la lógica para cuando uses uniforms en el fragment shader
-    const controles = {
-        luzX: 2.0,
-        luzY: 2.0,
-        luzZ: 5.0,
-
-        stepHigh: 0.8,
-        stepMid: 0.5,
-        stepLow: 0.1,
-                    
-        colorHigh: THREE.Color, 
-        colorMid: THREE.Color,
-        colorLow: THREE.Color,
-                    
-        shininess: 32,
-        specularStep: 0.5,
-    };
 
     this.fileGUI.addColor(this.parameters, 'colorObject').name("Color").onChange((nuevoHex: ColorHex) => {
       this.shader.uniforms.uObjectColor.value.set(nuevoHex);
@@ -160,14 +140,14 @@ export class ToonModel extends ModelsMesh<Toon> {
       this.mesh.scale.set(v, v, v);
     });
 
-    this.fileGUI.add(controles, 'shininess', 1, 256).name('Shininess').onChange((v: number) => {
+    this.fileGUI.add(this.parameters, 'shininess', 1, 256).name('Shininess').onChange((v: number) => {
         this.shader.uniforms.uShininess.value = v; // ¡Actualizamos la GPU!
     });
 
     const carpetaLuz = this.fileGUI.addFolder('Posición de la Luz');
-    carpetaLuz.add(controles, 'luzX', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.x = v);
-    carpetaLuz.add(controles, 'luzY', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.y = v);
-    carpetaLuz.add(controles, 'luzZ', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.z = v);
+    carpetaLuz.add(this.parameters, 'luzX', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.x = v);
+    carpetaLuz.add(this.parameters, 'luzY', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.y = v);
+    carpetaLuz.add(this.parameters, 'luzZ', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.z = v);
     
     const carpetaLuzColor = this.fileGUI.addFolder('Color de la Luz');
     carpetaLuzColor.addColor({ color: '#ffffff' }, 'color').name('Color de la Luz').onChange((nuevoHex: ColorHex) => {
@@ -179,10 +159,28 @@ export class ToonModel extends ModelsMesh<Toon> {
     });
 
     const carpetaBordes = this.fileGUI.addFolder('Radios de los circulos');
-    carpetaBordes.add(controles, 'stepHigh', 0, 1).onChange((v: number) => this.shader.uniforms.uStepHigh.value = v);
-    carpetaBordes.add(controles, 'stepMid', 0, 1).onChange((v: number) => this.shader.uniforms.uStepMid.value = v);
-    carpetaBordes.add(controles, 'stepLow', 0, 1).onChange((v: number) => this.shader.uniforms.uStepLow.value = v);
+    carpetaBordes.add(this.parameters, 'stepHigh', 0, 1).onChange((v: number) => this.shader.uniforms.uStepHigh.value = v);
+    carpetaBordes.add(this.parameters, 'stepMid', 0, 1).onChange((v: number) => this.shader.uniforms.uStepMid.value = v);
+    //carpetaBordes.add(this.parameters, 'stepLow', 0, 1).onChange((v: number) => this.shader.uniforms.uStepLow.value = v);
     
+    carpetaBordes.add(this.parameters, 'softness', 0, 0.1).onChange((v: number) => this.shader.uniforms.uSoftness.value = v);
+
+    const carpetaColores = this.fileGUI.addFolder('Colores de las bandas');
+    carpetaColores.addColor(this.parameters, 'colorHigh').name('Color Alto').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uColorHigh.value.set(nuevoHex);
+    });
+    carpetaColores.addColor(this.parameters, 'colorMid').name('Color Medio').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uColorMid.value.set(nuevoHex);
+    });
+
+    const carpetaOutline = this.fileGUI.addFolder('Contorno');
+    carpetaOutline.add(this.parameters, 'outlineThickness', 0.1, 0.5).name('Grosor del Contorno').onChange((v: number) => {
+        this.shader.uniforms.uOutlineThickness.value = v;
+    });
+    carpetaOutline.addColor(this.parameters, 'outlineColor').name('Color del Contorno').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uOutlineColor.value.set(nuevoHex);
+    });
+
     console.log('Construyendo modelo tipo toon');
   }
 }

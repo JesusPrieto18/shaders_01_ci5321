@@ -76,10 +76,6 @@ export function createTriangulo(name: string) {
 export function FragmentManipulation(name: string) {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
 
-    //geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    //geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    //geometry.setAttribute('scale', new THREE.BufferAttribute(new Float32Array([1, 1, 1]), 3)); 
-
     geometry.computeVertexNormals(); // Necesario para que el fragment shader tenga normales y se vea la iluminación
     
     // Programa de Shaders
@@ -106,6 +102,11 @@ export function FragmentManipulation(name: string) {
     addModel(name, geometry, material, {
         type: 'fragment',
         scale: 1,
+
+        luzX: 2.0,
+        luzY: 2.0,
+        luzZ: 5.0,
+
         colorSpecular: '#ffffff', // Blanco puro para el especular
         lightColor: '#ffffff', // Azul,
         meshColor: '#0004ff',
@@ -115,14 +116,9 @@ export function FragmentManipulation(name: string) {
 }
 
 export function ToonShading(name: string) {
-    const geometry = new THREE.CapsuleGeometry(1, 2, 16, 10); // Más subdivisiones para un mejor efecto de toon shading
+    const geometry = new THREE.TorusGeometry(5, 2,30,100); // Más subdivisiones para un mejor efecto de toon shading
     
-    //geometry.setIndex(indices);
-    //geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    //geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    //geometry.setAttribute('scale', new THREE.BufferAttribute(new Float32Array([1, 1, 1]), 3)); 
-
-    geometry.computeVertexNormals(); // Necesario para que el fragment shader tenga normales y se vea la iluminación
+    //geometry.computeVertexNormals(); // Necesario para que el fragment shader tenga normales y se vea la iluminación
     
     // Programa de Shaders
     const material = new THREE.RawShaderMaterial({
@@ -133,11 +129,11 @@ export function ToonShading(name: string) {
             projectionMatrix: { value: camera.projectionMatrix },
             viewMatrix: { value: camera.matrixWorldInverse },
             modelMatrix: { value: new THREE.Matrix4() },
+            uViewPos: { value: camera.position }, // NUEVO: La posición de la cámara a prueba de fallos
 
             uLightPos: { value: new THREE.Vector3(0,0,1) }, // Una "bombilla" arriba a la derecha
-            uViewPos: { value: camera.position }, // La posición de tu cámara (OrbitControls)
             uLightColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Luz Blanca
-            uObjectColor: { value: new THREE.Color('#0004ff') },
+            uObjectColor: { value: new THREE.Color('#047c36') },
 
             // Rangos de los degradados
             uStepHigh: { value: 0.8 },
@@ -145,37 +141,48 @@ export function ToonShading(name: string) {
             uStepLow: { value: 0.2 },
             
             // Colores de cada sección (usamos THREE.Color para facilidad)
-            uColorHigh: { value: new THREE.Color(1.0, 0.2, 0.2) }, // Rojo brillante
-            uColorMid: { value: new THREE.Color(0.7, 0.1, 0.1) },  // Rojo medio
+            uColorHigh: { value: new THREE.Color('#05b91db5') }, // Rojo brillante
+            uColorMid: { value: new THREE.Color('#0f8a0f') },  // Rojo medio
             uColorLow: { value: new THREE.Color(0.3, 0.0, 0.0) },  // Rojo oscuro / vino
             
+            uSoftness: { value: 0.02 },
+
             // Parámetros de brillo
             uSpecularColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Brillo blanco
             uShininess: { value: 32.0 },
             uSpecularStep: { value: 0.5 }, // Qué tan concentrado es el punto de luz
+            
             uOutlineThickness: { value: 0.25 }, // Ajusta este número de 0.1 a 0.5 para el grosor
             uOutlineColor: { value: new THREE.Color('#000000') } // Tinta negra
         }, 
-        side: THREE.DoubleSide
+        side: THREE.FrontSide
     });
 
     
     addModel(name, geometry, material, {
         type: 'toon',
         scale: 1,
-        colorObject: '#0004ff',
+        colorObject: '#047c36',
+
+        luzX: 0.0,
+        luzY: 0.0,
+        luzZ: 5.0,
 
         stepHigh: 0.8,
         stepMid: 0.5,
         stepLow: 0.2,
                     
-        colorHigh: '#ff0000', 
-        colorMid: '#7f0000',
-        colorLow: '#3f0000',
-                    
+        colorHigh: '#05b91db5', 
+        colorMid: '#0f8a0f',
+        colorLow: '#047c36',
+        
+        softness: 0.02 ,
         specularColor: '#ffffff', 
         shininess: 32.0,
-        specularStep: 0.5
+        specularStep: 0.5,
+
+        outlineColor: '#000000',
+        outlineThickness: 0.25
     });
 
 }
