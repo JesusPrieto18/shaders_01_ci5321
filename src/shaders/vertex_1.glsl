@@ -1,43 +1,27 @@
-// Matrices de transformación
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
+uniform float uSmoothness;  // Controla la suavidad del inflado
+uniform float uHardness;    // Controla la cantidad de inflado
 
-// Los parámetros vienen de la interfaz Vertex
-uniform float uSmoothness;  // = smoothness de la interfaz
-uniform float uHardness;    // = hardness de la interfaz
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec3 color;
 
-// Atributos del vértice
-in vec3 position;
-in vec3 normal;
-in vec3 color;  // colorV0, colorV1, colorV2
-
-// Variables de salida
-out vec3 vNormal;
-out vec3 vColor;
-out float vWaveIntensity;
+varying vec3 vColor;
+varying float vInflate;
 
 void main() {
-    // SOLO UNA ONDA usando los parámetros de la interfaz
-    float wave = sin(position.x * uSmoothness) * 
-                 cos(position.y * 1.5) * 
-                 sin(position.z * 1.2);
+    // Inflar/desinflar el modelo según la normal
+    // Usamos una función pseudo-aleatoria basada en la posición
+    float noise = fract(sin(position.x * 12.9898 + position.y * 78.233 + position.z * 37.719) * 43758.5453);
     
-    // hardness controla la amplitud
-    float offsetAmount = wave * 0.5 * uHardness;
-    
-    // Guardar intensidad para fragment
-    vWaveIntensity = (wave * 0.5) + 0.5;
-    
-    // Desplazar vértice
-    vec3 newPosition = position + normal * offsetAmount;
-    
-    // Transformaciones
-    vec4 mvPosition = viewMatrix * modelMatrix * vec4(newPosition, 1.0);
-    
-    // Pasar datos
+    float inflate = (noise - 0.5) * uHardness;
+    vInflate = inflate * 0.5 + 0.5;
     vColor = color;
-    vNormal = normalize(mat3(modelMatrix) * normal);
     
-    gl_Position = projectionMatrix * mvPosition;
+    // Desplazar a lo largo de la normal
+    vec3 newPosition = position + normal * inflate * uSmoothness;
+    
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(newPosition, 1.0);
 }
