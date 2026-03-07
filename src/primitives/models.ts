@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export type AllModels = Vertex | Fragment;
+export type AllModels = Vertex | Fragment | Toon;
 export type ColorHex = string;
 
 export interface Vertex{
@@ -13,9 +13,26 @@ export interface Vertex{
 export interface Fragment{
     type: 'fragment';
     scale: number;
-    color: ColorHex;
     colorSpecular: ColorHex;
-    LightColor: ColorHex;
-    ObjectColor: ColorHex;
-    Shininess: number
+    lightColor: ColorHex;
+    meshColor: ColorHex;
+    shininess: number
+}
+
+export interface Toon{
+    type: 'toon';
+    scale: number;
+    colorObject: ColorHex;
+    
+    stepHigh: number;
+    stepMid: number;
+    stepLow: number;
+                
+    colorHigh: ColorHex; 
+    colorMid: ColorHex;
+    colorLow: ColorHex;
+                
+    specularColor: ColorHex; 
+    shininess: number;
+    specularStep: number;
 }
