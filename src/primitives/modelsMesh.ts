@@ -82,16 +82,14 @@ export class VertexModel extends ModelsMesh<Vertex> {
       this.forEachMesh(mesh => {
           const material = mesh.material as THREE.RawShaderMaterial;
           if (material.uniforms) {
-              material.uniforms.uSmoothness = { value: params.smoothness };
-              material.uniforms.uHardness = { value: params.hardness };
+              material.uniforms.uSmoothness = { value: params.Smoothness };
+              material.uniforms.uHardness = { value: params.Hardness };
           }
       });
   }
   
   protected buildGUI(): void {
-    // ===========================================
-    // SECCIÓN 1: COLORES DE VÉRTICES (original)
-    // ===========================================
+
     this.fileGUI.addColor(this.parameters, 'colorV0').name("Color Vértice 0").onChange((nuevoHex: ColorHex) => {
       this.forEachMesh(mesh => {
         const material = mesh.material as THREE.MeshStandardMaterial;
@@ -122,12 +120,9 @@ export class VertexModel extends ModelsMesh<Vertex> {
       });
     });
 
-    // ===========================================
-    // SECCIÓN 2: PARÁMETROS DE LA ONDA (NUEVOS)
-    // ===========================================
-    const ondaFolder = this.fileGUI.addFolder('🌊 Parámetros de Onda');
+    const ondaFolder = this.fileGUI.addFolder('Parámetros de Onda');
     
-    ondaFolder.add(this.parameters, 'smoothness', 0.5, 5.0)
+    ondaFolder.add(this.parameters, 'Smoothness', 0.5, 5.0)
         .name('Frecuencia')
         .step(0.1)
         .onChange((nuevoValor: number) => {
@@ -139,7 +134,7 @@ export class VertexModel extends ModelsMesh<Vertex> {
             });
         });
     
-    ondaFolder.add(this.parameters, 'hardness', 0.2, 3.0)
+    ondaFolder.add(this.parameters, 'Hardness', 0.2, 3.0)
         .name('Amplitud')
         .step(0.1)
         .onChange((nuevoValor: number) => {

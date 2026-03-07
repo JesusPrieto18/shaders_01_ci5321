@@ -60,6 +60,8 @@ export function createTriangulo(name: string) {
             projectionMatrix: { value: camera.projectionMatrix },
             viewMatrix: { value: camera.matrixWorldInverse },
             modelMatrix: { value: new THREE.Matrix4() },
+            Smoothness: {value: 0.5},
+            Hardness: {value: 0.5}
         },
         glslVersion: THREE.GLSL3, 
         side: THREE.DoubleSide

@@ -9,8 +9,8 @@ export interface Vertex {
     colorV1: ColorHex;
     colorV2: ColorHex;
     // NUEVOS PARÁMETROS REQUERIDOS
-    smoothness: number;  // Controla frecuencia de la onda
-    hardness: number;    // Controla amplitud de la onda
+    Smoothness: number;  // Controla frecuencia de la onda
+    Hardness: number;    // Controla amplitud de la onda
 }
 
 export interface Fragment{
