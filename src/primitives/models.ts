@@ -3,11 +3,14 @@ import * as THREE from 'three';
 export type AllModels = Vertex | Fragment | Toon;
 export type ColorHex = string;
 
-export interface Vertex{
+export interface Vertex {
     type: 'vertex';
-    colorV0: ColorHex; // Vértice 0 (Abajo Izquierda)
-    colorV1: ColorHex; // Vértice 1 (Abajo Derecha)
+    colorV0: ColorHex;
+    colorV1: ColorHex;
     colorV2: ColorHex;
+    // NUEVOS PARÁMETROS REQUERIDOS
+    smoothness: number;  // Controla frecuencia de la onda
+    hardness: number;    // Controla amplitud de la onda
 }
 
 export interface Fragment{

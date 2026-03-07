@@ -70,6 +70,8 @@ export function createTriangulo(name: string) {
         colorV0: '#ff0000', // Rojo
         colorV1: '#00ff00', // Verde
         colorV2: '#0000ff', // Azul,
+        smoothness: 5.0, // Controla la frecuencia de la onda
+        hardness: 0.5 // Controla la amplitud de la onda
     });
 }
 
