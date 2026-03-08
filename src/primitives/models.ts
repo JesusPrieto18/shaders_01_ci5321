@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export type AllModels = Vertex | Fragment | Toon;
+export type AllModels = Vertex | Fragment | Toon | Shockwave;
 export type ColorHex = string;
 
 export interface Vertex{
@@ -48,4 +48,10 @@ export interface Toon{
 
     outlineThickness: number;
     outlineColor: ColorHex;
+}
+
+export interface Shockwave{
+    type: 'shockwave';
+    scale: number;
+    colorObject: ColorHex;
 }

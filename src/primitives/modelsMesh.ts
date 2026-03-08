@@ -1,10 +1,7 @@
 import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { scene } from '../config/config';
-import {AllModels,Vertex, Fragment, ColorHex, Toon} from './models';
-import { color, positionGeometry } from 'three/tsl';
-import { TGALoader } from 'three/examples/jsm/Addons.js';
-import { outline } from 'three/examples/jsm/tsl/display/OutlineNode.js';
+import {AllModels,Vertex, Fragment, ColorHex, Toon, Shockwave} from './models';
 
 const gui = new GUI();
 gui.title('Controles del Modelo');
@@ -184,6 +181,29 @@ export class ToonModel extends ModelsMesh<Toon> {
     console.log('Construyendo modelo tipo toon');
   }
 }
+export class ShockwaveModel extends ModelsMesh<Shockwave> {
+  constructor(name: string, geometry: THREE.BufferGeometry | THREE.Group, shader: THREE.RawShaderMaterial, params: Shockwave) {
+    super(name, geometry, shader, params);
+    this.mesh.name = "shockwave"
+    this.buildGUI();
+
+  }
+
+  protected buildGUI(): void {
+
+    this.fileGUI.addColor(this.parameters, 'colorObject').name("Color").onChange((nuevoHex: ColorHex) => {
+      this.shader.uniforms.uObjectColor.value.set(nuevoHex);
+    });
+
+    this.fileGUI.add(this.parameters, 'scale', 0.1, 5.0).name('Escala Global').onChange((v: number) => {
+      // scale.set(x, y, z) escala uniformemente en todos los ejes
+      this.mesh.scale.set(v, v, v);
+    });
+
+    console.log('Construyendo modelo tipo shockwave');
+  }
+}
+
 export function changeModel(nuevoIndice: number) {
   if (nuevoIndice === indiceActivo) {
     console.log(`Ya estás viendo el modelo "${models[indiceActivo].getNombre()}". No se realizará ningún cambio.`);
@@ -212,6 +232,8 @@ export function addModel(nombre: string, geometria: THREE.BufferGeometry  | THRE
       model = new FragmentModel(nombre, geometria, shader, parametros);
   } else if (parametros.type === 'toon') {
       model = new ToonModel(nombre, geometria, shader, parametros);
+  } else if (parametros.type === 'shockwave') {
+      model = new ShockwaveModel(nombre, geometria, shader, parametros); 
   } else {
       throw new Error("Tipo de modelo no soportado");
   }

@@ -1,10 +1,12 @@
 import * as THREE from 'three';
-import vs from '../shaders/vertex.glsl?raw';
-import fs from '../shaders/fragment.glsl?raw';
+import vs from '../shaders/vertex_1.glsl?raw';
+import fs from '../shaders/fragment_1.glsl?raw';
 import vs2 from '../shaders/vertex_2.glsl?raw';
 import fs2 from '../shaders/fragment_2.glsl?raw';
 import vs3 from '../shaders/vertex_3.glsl?raw';
 import fs3 from '../shaders/fragment_3.glsl?raw';
+import vs4 from '../shaders/vertex_4.glsl?raw';
+import fs4 from '../shaders/fragment_4.glsl?raw';
 import { camera } from '../config/config';
 import { addModel } from './modelsMesh';
 
@@ -103,9 +105,9 @@ export function FragmentManipulation(name: string) {
         type: 'fragment',
         scale: 1,
 
-        luzX: 2.0,
-        luzY: 2.0,
-        luzZ: 5.0,
+        luzX: 0,
+        luzY: 0,
+        luzZ: 1,
 
         colorSpecular: '#ffffff', // Blanco puro para el especular
         lightColor: '#ffffff', // Azul,
@@ -185,4 +187,36 @@ export function ToonShading(name: string) {
         outlineThickness: 0.25
     });
 
+}
+
+export function Shockwave(name: string) {
+    const geometry = new THREE.PlaneGeometry(5, 5, 128, 128);
+
+    geometry.rotateX(-Math.PI / 2); // Girar para que quede horizontal
+    //geometry.computeVertexNormals(); // Necesario para que el fragment shader tenga normales y se vea la iluminación
+    const material = new THREE.RawShaderMaterial({
+        vertexShader: vs4,
+        fragmentShader: fs2,
+        glslVersion: THREE.GLSL3,
+        uniforms: {
+            projectionMatrix: { value: camera.projectionMatrix },
+            viewMatrix: { value: camera.matrixWorldInverse },
+            modelMatrix: { value: new THREE.Matrix4() },
+
+            uLightPos: { value: new THREE.Vector3(0,1,0) }, // Una "bombilla" arriba a la derecha
+            uViewPos: { value: camera.position }, // La posición de tu cámara (OrbitControls)
+            uLightColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Luz Blanca
+            uObjectColor: { value: new THREE.Color('#0004ff') },
+            uSpecularColor: { value: new THREE.Color(1,1,1) }, //  El color específico del brillo
+            uShininess: { value: 32.0 }, // 32 es un buen valor plástico. Metales usan 128 o 256.
+            uTime: { value: 0.0 },
+        }, 
+        side: THREE.FrontSide
+    });
+
+    addModel(name, geometry, material, {
+        type: 'shockwave',
+        scale: 1,
+        colorObject: '#10047c'
+    });
 }

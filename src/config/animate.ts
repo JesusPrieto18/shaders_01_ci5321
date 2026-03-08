@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { scene, camera, renderer, controls} from './config';
 
-export function animate() {
+export function animate(time: number) {
+    
     //controls.update();
 
     window.addEventListener('resize', () => {
@@ -11,6 +12,16 @@ export function animate() {
     camera.updateProjectionMatrix(); 
     // 3. Actualizamos el tamaño del renderizador
     renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    scene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+            if (child.material instanceof THREE.RawShaderMaterial) {
+                if (child.name === "shockwave") {
+                    child.material.uniforms.uTime.value = time * 0.001;
+                }
+            }
+        }
     });
 
     renderer.render(scene, camera);
