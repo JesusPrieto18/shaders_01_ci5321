@@ -76,80 +76,32 @@ export class ModelsMesh<T extends AllModels> {
 export class VertexModel extends ModelsMesh<Vertex> {
   constructor(name: string, geometry: THREE.BufferGeometry | THREE.Group, shader: THREE.RawShaderMaterial, params: Vertex) {
       super(name, geometry, shader, params);
-      this.buildGUI(); // Llamamos a su propio constructor de UI
+      this.buildGUI();
       
-      // Inicializar los uniforms del shader con los valores de los parámetros
+      // Inicializar uniforms
       this.forEachMesh(mesh => {
           const material = mesh.material as THREE.RawShaderMaterial;
-          if (material.uniforms) {
-              material.uniforms.uSmoothness = { value: params.Smoothness };
-              material.uniforms.uHardness = { value: params.Hardness };
-          }
+          material.uniforms.Smoothness = { value: params.Smoothness };
+          material.uniforms.Hardness = { value: params.Hardness };
       });
   }
   
   protected buildGUI(): void {
 
-    this.fileGUI.addColor(this.parameters, 'colorV0').name("Color Vértice 0").onChange((nuevoHex: ColorHex) => {
+    // Parámetros de deformación
+    const deformFolder = this.fileGUI.addFolder('Deformación');
+    deformFolder.add(this.parameters, 'Smoothness', -5.0, 5.0).name('Frecuencia').onChange((val: any) => {
       this.forEachMesh(mesh => {
-        const material = mesh.material as THREE.MeshStandardMaterial;
-        material.vertexColors = true;
-        const colorAttribute = mesh.geometry.getAttribute('color') as THREE.BufferAttribute;
-        colorAttribute.setXYZ(0, new THREE.Color(nuevoHex).r, new THREE.Color(nuevoHex).g, new THREE.Color(nuevoHex).b);
-        colorAttribute.needsUpdate = true;
+        (mesh.material as THREE.RawShaderMaterial).uniforms.Smoothness.value = val;
       });
     });
-
-    this.fileGUI.addColor(this.parameters, 'colorV1').name("Color Vértice 1").onChange((nuevoHex: ColorHex) => {
+    deformFolder.add(this.parameters, 'Hardness', 0.0, 2.0).name('Amplitud').onChange((val: any) => {
       this.forEachMesh(mesh => {
-        const material = mesh.material as THREE.MeshStandardMaterial;
-        material.vertexColors = true;
-        const colorAttribute = mesh.geometry.getAttribute('color') as THREE.BufferAttribute;
-        colorAttribute.setXYZ(1, new THREE.Color(nuevoHex).r, new THREE.Color(nuevoHex).g, new THREE.Color(nuevoHex).b);
-        colorAttribute.needsUpdate = true;
+        (mesh.material as THREE.RawShaderMaterial).uniforms.Hardness.value = val;
       });
     });
-
-    this.fileGUI.addColor(this.parameters, 'colorV2').name("Color Vértice 2").onChange((nuevoHex: ColorHex) => {
-      this.forEachMesh(mesh => {
-        const material = mesh.material as THREE.MeshStandardMaterial;
-        material.vertexColors = true;
-        const colorAttribute = mesh.geometry.getAttribute('color') as THREE.BufferAttribute;
-        colorAttribute.setXYZ(2, new THREE.Color(nuevoHex).r, new THREE.Color(nuevoHex).g, new THREE.Color(nuevoHex).b);
-        colorAttribute.needsUpdate = true;
-      });
-    });
-
-    const ondaFolder = this.fileGUI.addFolder('Parámetros de Onda');
-    
-    ondaFolder.add(this.parameters, 'Smoothness', 0.5, 5.0)
-        .name('Frecuencia')
-        .step(0.1)
-        .onChange((nuevoValor: number) => {
-            this.forEachMesh(mesh => {
-                const material = mesh.material as THREE.RawShaderMaterial;
-                if (material.uniforms && material.uniforms.uSmoothness) {
-                    material.uniforms.uSmoothness.value = nuevoValor;
-                }
-            });
-        });
-    
-    ondaFolder.add(this.parameters, 'Hardness', 0.2, 3.0)
-        .name('Amplitud')
-        .step(0.1)
-        .onChange((nuevoValor: number) => {
-            this.forEachMesh(mesh => {
-                const material = mesh.material as THREE.RawShaderMaterial;
-                if (material.uniforms && material.uniforms.uHardness) {
-                    material.uniforms.uHardness.value = nuevoValor;
-                }
-            });
-        });
-    
-    ondaFolder.open();
-
-    console.log('Construyendo modelo tipo vertex con parámetros de onda');
-  }       
+    deformFolder.open();
+  }
 }
 
 export class FragmentModel extends ModelsMesh<Fragment> {

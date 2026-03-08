@@ -1,27 +1,38 @@
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
-uniform float uSmoothness;  // Controla la suavidad del inflado
-uniform float uHardness;    // Controla la cantidad de inflado
+uniform float Smoothness;  // Longitud
+uniform float Hardness;    // Curvatura
 
-attribute vec3 position;
-attribute vec3 normal;
-attribute vec3 color;
+in vec3 position;
+in vec3 normal;
+in vec3 color;
 
-varying vec3 vColor;
-varying float vInflate;
+out vec3 vColor;
+out vec3 vNormal;
+out float vIntensity;
 
 void main() {
-    // Inflar/desinflar el modelo según la normal
-    // Usamos una función pseudo-aleatoria basada en la posición
-    float noise = fract(sin(position.x * 12.9898 + position.y * 78.233 + position.z * 37.719) * 43758.5453);
+    // ===== EFECTO LÁTIGO =====
+    // Hacer que el cono se curve como un látigo
     
-    float inflate = (noise - 0.5) * uHardness;
-    vInflate = inflate * 0.5 + 0.5;
+    // Normalizar altura
+    float t = (position.y + 1.0) * 0.5;
+    
+    // Curvatura parabólica
+    float curveX = t * t * Smoothness;
+    float curveZ = t * Hardness;
+    
+    vIntensity = t;
+    
+    // Aplicar curvatura
+    vec3 newPosition = position;
+    newPosition.x += curveX;
+    newPosition.z += curveZ;
+    newPosition.y *= 1.0 + t * 0.5; // Estirar un poco
+    
     vColor = color;
-    
-    // Desplazar a lo largo de la normal
-    vec3 newPosition = position + normal * inflate * uSmoothness;
+    vNormal = normalize(mat3(modelMatrix) * normal);
     
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(newPosition, 1.0);
 }

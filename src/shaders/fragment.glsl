@@ -1,11 +1,10 @@
-precision highp float;
+precision mediump float;
 
-attribute vec3 vColor;
-attribute float vIntensity;  // Cambia el nombre según el vertex shader
+in vec3 vColor;
+
+out vec4 fragColor; // Necesario porque en RawShader no existe gl_FragColor automático en GLSL3
 
 void main() {
-    // Mezcla el color del vértice con la intensidad del efecto
-    vec3 finalColor = vColor * (0.5 + 0.5 * vIntensity);
-    gl_FragColor = vec4(finalColor, 1.0);
+    fragColor = vec4(vColor, 1.0);
 }
 
