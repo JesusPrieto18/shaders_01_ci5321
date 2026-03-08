@@ -11,51 +11,26 @@ import vs5 from '../shaders/vertex_5.glsl?raw';
 import vs6 from '../shaders/vertex_6.glsl?raw';
 import { camera } from '../config/config';
 import { addModel } from './modelsMesh';
+import { color } from 'three/tsl';
 
 export function createTriangulo(name: string) {
-
+    // Crear geometría
     const geometry = new THREE.CylinderGeometry(0, 1, 2, 3);
-    //geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    //geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     
-    // 2. Extraer cuántos vértices generó Three.js realmente
-    const posiciones = geometry.attributes.position;
-    const cantidadVertices = posiciones.count;
-
-    // 3. Crear un arreglo vacío para guardar los colores (R, G, B por cada vértice)
-    const colores = new Float32Array(cantidadVertices * 3);
-    const colorTemporal = new THREE.Color();
-
-    // 4. Recorrer cada vértice y decidir su color basado en su posición (X, Y, Z)
-    for (let i = 0; i < cantidadVertices; i++) {
-        const x = posiciones.getX(i);
-        const y = posiciones.getY(i);
-        // const z = posiciones.getZ(i); // Útil si quieres más precisión espacial
-
-        // Lógica de pintura espacial:
-        if (y > 0) {
-            // Si el vértice está en la mitad superior (la punta)
-            colorTemporal.setHex(0xff0000); // Rojo
-        } else {
-            // Si el vértice está en la base
-            if (x > 0) {
-                colorTemporal.setHex(0x00ff00); // Verde (derecha)
-            } else if (x < 0) {
-                colorTemporal.setHex(0x0000ff); // Azul (izquierda)
-            } else {
-                colorTemporal.setHex(0xffff00); // Amarillo (centro/atrás)
-            }
-        }
-
-        // Guardar el color en el arreglo plano
-        colores[i * 3] = colorTemporal.r;
-        colores[i * 3 + 1] = colorTemporal.g;
-        colores[i * 3 + 2] = colorTemporal.b;
+    // ===== AÑADIR COLORES A LA GEOMETRÍA =====
+    // Obtener el número de vértices
+    const positionAttribute = geometry.getAttribute('position');
+    const vertexCount = positionAttribute.count;
+    
+    // Crear array de colores (todos rojos)
+    const colors = [];
+    for (let i = 0; i < vertexCount; i++) {
+        colors.push(1.0, 0.0, 0.0); // Rojo para todos los vértices
     }
-
-    // 5. INYECTAR el atributo 'color' a la primitiva
-    geometry.setAttribute('color', new THREE.BufferAttribute(colores, 3));
-
+    
+    // Añadir el atributo 'color' a la geometría
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    
     // Programa de Shaders
     const material = new THREE.RawShaderMaterial({
         vertexShader: vs,
@@ -64,8 +39,8 @@ export function createTriangulo(name: string) {
             projectionMatrix: { value: camera.projectionMatrix },
             viewMatrix: { value: camera.matrixWorldInverse },
             modelMatrix: { value: new THREE.Matrix4() },
-            Smoothness: {value: 0.5},
-            Hardness: {value: 0.5}
+            Smoothness: { value: 0.0 },
+            Hardness: { value: 0.0 }
         },
         glslVersion: THREE.GLSL3, 
         side: THREE.DoubleSide
@@ -73,11 +48,9 @@ export function createTriangulo(name: string) {
 
     addModel(name, geometry, material, {
         type: 'vertex',
-        colorV0: '#ff0000', // Rojo
-        colorV1: '#00ff00', // Verde
-        colorV2: '#0000ff', // Azul,
-        smoothness: 5.0, // Controla la frecuencia de la onda
-        hardness: 0.5 // Controla la amplitud de la onda
+        color: '#ff0000',
+        Smoothness: 0.0,
+        Hardness: 0.0
     });
 }
 
