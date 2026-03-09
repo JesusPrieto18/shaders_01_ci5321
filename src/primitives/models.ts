@@ -6,6 +6,7 @@ export type ColorHex = string;
 export interface Vertex {
     type: 'vertex';
     color: ColorHex,
+    scale: number;
     // NUEVOS PARÁMETROS REQUERIDOS
     Smoothness: number;  // Controla frecuencia de la onda
     Hardness: number;    // Controla amplitud de la onda

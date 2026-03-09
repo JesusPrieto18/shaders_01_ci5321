@@ -84,6 +84,17 @@ export class VertexModel extends ModelsMesh<Vertex> {
   }
   
   protected buildGUI(): void {
+    //color
+    this.fileGUI.addColor(this.parameters, 'color').name("Color").onChange((nuevoHex: ColorHex) => {
+      this.forEachMesh(mesh => {
+        (mesh.material as THREE.RawShaderMaterial).uniforms.color.value.set(nuevoHex);
+      });
+    });
+    
+    this.fileGUI.add(this.parameters, 'scale', 0.1, 5.0).name('Escala Global').onChange((v: number) => {
+      // scale.set(x, y, z) escala uniformemente en todos los ejes
+      this.mesh.scale.set(v, v, v);
+    });
 
     // Parámetros de deformación
     const deformFolder = this.fileGUI.addFolder('Deformación');

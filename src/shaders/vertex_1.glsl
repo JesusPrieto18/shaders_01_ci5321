@@ -1,12 +1,14 @@
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
+uniform vec3 color;
+
 uniform float Smoothness;  // Longitud
 uniform float Hardness;    // Curvatura
 
 in vec3 position;
 in vec3 normal;
-in vec3 color;
+
 
 out vec3 vColor;
 out vec3 vNormal;
