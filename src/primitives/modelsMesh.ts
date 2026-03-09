@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { scene } from '../config/config';
-import {AllModels,Vertex, Fragment, ColorHex, Toon, Shockwave} from './models';
+import {AllModels,Vertex, Fragment, ColorHex, Toon, Shockwave, ShockToon} from './models';
 
 const gui = new GUI();
 gui.title('Controles del Modelo');
@@ -200,6 +200,91 @@ export class ShockwaveModel extends ModelsMesh<Shockwave> {
       this.mesh.scale.set(v, v, v);
     });
 
+    this.fileGUI.add(this.parameters, 'velocity', 0.1, 10.0).name('Velocidad').onChange((v: number) => {
+        this.shader.uniforms.uVelocity.value = v; // ¡Actualizamos la GPU!
+    });
+
+    this.fileGUI.add(this.parameters, 'frequency', 0.1, 20.0).name('Frecuencia').onChange((v: number) => {
+        this.shader.uniforms.uFrequency.value = v; // ¡Actualizamos la GPU!
+    });
+    this.fileGUI.add(this.parameters, 'amplitude', 0.1, 5.0).name('Amplitud').onChange((v: number) => {
+        this.shader.uniforms.uAmplitude.value = v; // ¡Actualizamos la GPU!
+    });
+
+    console.log('Construyendo modelo tipo shockwave');
+  }
+}
+
+export class ShockToonModel extends ModelsMesh<ShockToon> {
+  constructor(name: string, geometry: THREE.BufferGeometry | THREE.Group, shader: THREE.RawShaderMaterial, params: ShockToon) {
+    super(name, geometry, shader, params);
+    this.mesh.name = "shocktoon"
+    this.buildGUI();
+
+  }
+
+  protected buildGUI(): void {
+
+    this.fileGUI.addColor(this.parameters, 'colorObject').name("Color").onChange((nuevoHex: ColorHex) => {
+      this.shader.uniforms.uObjectColor.value.set(nuevoHex);
+    });
+
+    this.fileGUI.add(this.parameters, 'scale', 0.1, 5.0).name('Escala Global').onChange((v: number) => {
+      // scale.set(x, y, z) escala uniformemente en todos los ejes
+      this.mesh.scale.set(v, v, v);
+    });
+
+    this.fileGUI.add(this.parameters, 'velocity', 0.1, 10.0).name('Velocidad').onChange((v: number) => {
+        this.shader.uniforms.uVelocity.value = v; // ¡Actualizamos la GPU!
+    });
+
+    this.fileGUI.add(this.parameters, 'frequency', 0.1, 20.0).name('Frecuencia').onChange((v: number) => {
+        this.shader.uniforms.uFrequency.value = v; // ¡Actualizamos la GPU!
+    });
+    this.fileGUI.add(this.parameters, 'amplitude', 0.1, 5.0).name('Amplitud').onChange((v: number) => {
+        this.shader.uniforms.uAmplitude.value = v; // ¡Actualizamos la GPU!
+    });
+
+    this.fileGUI.add(this.parameters, 'shininess', 1, 256).name('Shininess').onChange((v: number) => {
+        this.shader.uniforms.uShininess.value = v; // ¡Actualizamos la GPU!
+    });
+
+    const carpetaLuz = this.fileGUI.addFolder('Posición de la Luz');
+    carpetaLuz.add(this.parameters, 'luzX', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.x = v);
+    carpetaLuz.add(this.parameters, 'luzY', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.y = v);
+    carpetaLuz.add(this.parameters, 'luzZ', -10, 10, 1).onChange((v: number) => this.shader.uniforms.uLightPos.value.z = v);
+    
+    const carpetaLuzColor = this.fileGUI.addFolder('Color de la Luz');
+    carpetaLuzColor.addColor({ color: '#ffffff' }, 'color').name('Color de la Luz').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uLightColor.value.set(nuevoHex);
+    });
+
+    carpetaLuzColor.addColor({ color: '#ffffff' }, 'color').name('Color del Especular').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uSpecularColor.value.set(nuevoHex);
+    });
+
+    const carpetaBordes = this.fileGUI.addFolder('Radios de los circulos');
+    carpetaBordes.add(this.parameters, 'stepHigh', 0, 1).onChange((v: number) => this.shader.uniforms.uStepHigh.value = v);
+    carpetaBordes.add(this.parameters, 'stepMid', 0, 1).onChange((v: number) => this.shader.uniforms.uStepMid.value = v);
+    //carpetaBordes.add(this.parameters, 'stepLow', 0, 1).onChange((v: number) => this.shader.uniforms.uStepLow.value = v);
+    
+    carpetaBordes.add(this.parameters, 'softness', 0, 0.1).onChange((v: number) => this.shader.uniforms.uSoftness.value = v);
+
+    const carpetaColores = this.fileGUI.addFolder('Colores de las bandas');
+    carpetaColores.addColor(this.parameters, 'colorHigh').name('Color Alto').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uColorHigh.value.set(nuevoHex);
+    });
+    carpetaColores.addColor(this.parameters, 'colorMid').name('Color Medio').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uColorMid.value.set(nuevoHex);
+    });
+
+    const carpetaOutline = this.fileGUI.addFolder('Contorno');
+    carpetaOutline.add(this.parameters, 'outlineThickness', 0.1, 0.5).name('Grosor del Contorno').onChange((v: number) => {
+        this.shader.uniforms.uOutlineThickness.value = v;
+    });
+    carpetaOutline.addColor(this.parameters, 'outlineColor').name('Color del Contorno').onChange((nuevoHex: ColorHex) => {
+        this.shader.uniforms.uOutlineColor.value.set(nuevoHex);
+    });
     console.log('Construyendo modelo tipo shockwave');
   }
 }
@@ -234,6 +319,8 @@ export function addModel(nombre: string, geometria: THREE.BufferGeometry  | THRE
       model = new ToonModel(nombre, geometria, shader, parametros);
   } else if (parametros.type === 'shockwave') {
       model = new ShockwaveModel(nombre, geometria, shader, parametros); 
+  } else if (parametros.type === 'shocktoon') {
+      model = new ShockToonModel(nombre, geometria, shader, parametros);
   } else {
       throw new Error("Tipo de modelo no soportado");
   }

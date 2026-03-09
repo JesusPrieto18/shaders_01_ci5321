@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export type AllModels = Vertex | Fragment | Toon | Shockwave;
+export type AllModels = Vertex | Fragment | Toon | Shockwave | ShockToon;
 export type ColorHex = string;
 
 export interface Vertex{
@@ -54,4 +54,37 @@ export interface Shockwave{
     type: 'shockwave';
     scale: number;
     colorObject: ColorHex;
+    velocity: number;
+    frequency: number;
+    amplitude: number;
+}
+
+export interface ShockToon{
+    type: 'shocktoon';
+    scale: number;
+    colorObject: ColorHex;
+
+    velocity: number;
+    frequency: number;
+    amplitude: number;
+
+    luzX: number;
+    luzY: number;
+    luzZ: number;
+
+    stepHigh: number;
+    stepMid: number;
+    stepLow: number;
+                
+    colorHigh: ColorHex; 
+    colorMid: ColorHex;
+    colorLow: ColorHex;
+
+    softness: number;   
+    specularColor: ColorHex; 
+    shininess: number;
+    specularStep: number;
+
+    outlineThickness: number;
+    outlineColor: ColorHex;
 }

@@ -1,6 +1,7 @@
 // #version 300 es
 precision highp float;
 
+// vertex_ripple.glsl
 in vec3 position;
 in vec3 normal;
 
@@ -13,9 +14,11 @@ uniform float uVelocity;   // Controla la velocidad de expansión de la onda
 uniform float uAmplitude;  // Controla la altura máxima de la onda
 // ¡EL NUEVO INGREDIENTE! El reloj que controlará la expansión
 uniform float uTime; 
+uniform vec3 uViewPos; // RECIBIMOS LA CÁMARA VIVA
 
 out vec3 vNormal;
 out vec3 vFragPos;
+out vec3 vViewDir;
 
 void main() {
     // 1. Calculamos la distancia de este vértice respecto al centro (0,0) en el plano XZ (piso)
@@ -37,10 +40,14 @@ void main() {
     vec3 newPosition = position;
     newPosition.y += wave * amplitud;
 
-    // Pasamos las variables al Fragment Shader (por si quieres usar tu Toon Shading aquí también)
     vNormal = normalize(mat3(modelMatrix) * normal);
+    
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
     vFragPos = (modelMatrix * vec4(newPosition, 1.0)).xyz;
-
+    //vFragPos = worldPosition.xyz;
+    
+    // MAGIA: Usamos la posición viva en lugar de la inversa de la matriz congelada
+    vViewDir = normalize(uViewPos - vec3(worldPosition));
     // Calculamos la posición final en pantalla usando nuestra NUEVA posición
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(newPosition, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
 }

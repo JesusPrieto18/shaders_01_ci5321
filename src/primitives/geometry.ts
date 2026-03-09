@@ -7,6 +7,8 @@ import vs3 from '../shaders/vertex_3.glsl?raw';
 import fs3 from '../shaders/fragment_3.glsl?raw';
 import vs4 from '../shaders/vertex_4.glsl?raw';
 import fs4 from '../shaders/fragment_4.glsl?raw';
+import vs5 from '../shaders/vertex_5.glsl?raw';
+import vs6 from '../shaders/vertex_6.glsl?raw';
 import { camera } from '../config/config';
 import { addModel } from './modelsMesh';
 
@@ -202,6 +204,10 @@ export function Shockwave(name: string) {
             projectionMatrix: { value: camera.projectionMatrix },
             viewMatrix: { value: camera.matrixWorldInverse },
             modelMatrix: { value: new THREE.Matrix4() },
+            
+            uFrequency: { value: 4.0 },
+            uVelocity: { value: 2.0 },
+            uAmplitude: { value: 2.0 },
 
             uLightPos: { value: new THREE.Vector3(0,1,0) }, // Una "bombilla" arriba a la derecha
             uViewPos: { value: camera.position }, // La posición de tu cámara (OrbitControls)
@@ -217,6 +223,165 @@ export function Shockwave(name: string) {
     addModel(name, geometry, material, {
         type: 'shockwave',
         scale: 1,
-        colorObject: '#10047c'
+        colorObject: '#10047c',
+        velocity: 2.0,
+        frequency: 4.0,
+        amplitude: 2.0,
+    });
+}
+
+export function ShockToon(name: string) {
+    const geometry = new THREE.PlaneGeometry(5, 5, 128, 128);
+
+    geometry.rotateX(-Math.PI / 2); // Girar para que quede horizontal
+    //geometry.computeVertexNormals(); // Necesario para que el fragment shader tenga normales y se vea la iluminación
+    const material = new THREE.RawShaderMaterial({
+        vertexShader: vs5,
+        fragmentShader: fs3,
+        glslVersion: THREE.GLSL3,
+        uniforms: {
+            projectionMatrix: { value: camera.projectionMatrix },
+            viewMatrix: { value: camera.matrixWorldInverse },
+            modelMatrix: { value: new THREE.Matrix4() },
+            
+            uFrequency: { value: 4.0 },
+            uVelocity: { value: 2.0 },
+            uAmplitude: { value: 2.0 },
+
+            uViewPos: { value: camera.position }, // NUEVO: La posición de la cámara a prueba de fallos
+
+            uLightPos: { value: new THREE.Vector3(0,0,1) }, // Una "bombilla" arriba a la derecha
+            uLightColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Luz Blanca
+            uObjectColor: { value: new THREE.Color('#10047c') },
+
+            // Rangos de los degradados
+            uStepHigh: { value: 0.8 },
+            uStepMid: { value: 0.5 },
+            uStepLow: { value: 0.2 },
+            
+            // Colores de cada sección (usamos THREE.Color para facilidad)
+            uColorHigh: { value: new THREE.Color('#303df1e8') }, // Rojo brillante
+            uColorMid: { value: new THREE.Color('#116af0') },  // Rojo medio
+            uColorLow: { value: new THREE.Color(0.3, 0.0, 0.0) },  // Rojo oscuro / vino
+            
+            uSoftness: { value: 0.02 },
+
+            // Parámetros de brillo
+            uSpecularColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Brillo blanco
+            uShininess: { value: 32.0 },
+            uSpecularStep: { value: 0.5 }, // Qué tan concentrado es el punto de luz
+            
+            uOutlineThickness: { value: 0.25 }, // Ajusta este número de 0.1 a 0.5 para el grosor
+            uOutlineColor: { value: new THREE.Color('#000000') }, // Tinta negra
+            uTime: { value: 0.0 },
+        }, 
+        side: THREE.FrontSide
+    });
+
+    addModel(name, geometry, material, {
+        type: 'shocktoon',
+        scale: 1,
+        colorObject: '#10047c',
+        velocity: 2.0,
+        frequency: 4.0,
+        amplitude: 2.0,
+        
+        luzX: 0.0,
+        luzY: 0.0,
+        luzZ: 5.0,
+
+        stepHigh: 0.8,
+        stepMid: 0.5,
+        stepLow: 0.2,
+                    
+        colorHigh: '#303df1e8', 
+        colorMid: '#116af0',
+        colorLow: '#03c0f0',
+        
+        softness: 0.02 ,
+        specularColor: '#ffffff', 
+        shininess: 32.0,
+        specularStep: 0.5,
+
+        outlineColor: '#000000',
+        outlineThickness: 0.25
+    });
+}
+
+export function ShockFragmentToon(name: string) {
+    const geometry = new THREE.PlaneGeometry(5, 5, 128, 128);
+
+    geometry.rotateX(-Math.PI / 2); // Girar para que quede horizontal
+    //geometry.computeVertexNormals(); // Necesario para que el fragment shader tenga normales y se vea la iluminación
+    const material = new THREE.RawShaderMaterial({
+        vertexShader: vs6,
+        fragmentShader: fs3,
+        glslVersion: THREE.GLSL3,
+        uniforms: {
+            projectionMatrix: { value: camera.projectionMatrix },
+            viewMatrix: { value: camera.matrixWorldInverse },
+            modelMatrix: { value: new THREE.Matrix4() },
+            
+            uFrequency: { value: 4.0 },
+            uVelocity: { value: 2.0 },
+            uAmplitude: { value: 2.0 },
+
+            uViewPos: { value: camera.position }, // NUEVO: La posición de la cámara a prueba de fallos
+
+            uLightPos: { value: new THREE.Vector3(0,0,1) }, // Una "bombilla" arriba a la derecha
+            uLightColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Luz Blanca
+            uObjectColor: { value: new THREE.Color('#10047c') },
+
+            // Rangos de los degradados
+            uStepHigh: { value: 0.8 },
+            uStepMid: { value: 0.5 },
+            uStepLow: { value: 0.2 },
+            
+            // Colores de cada sección (usamos THREE.Color para facilidad)
+            uColorHigh: { value: new THREE.Color('#303df1e8') }, // Rojo brillante
+            uColorMid: { value: new THREE.Color('#116af0') },  // Rojo medio
+            uColorLow: { value: new THREE.Color(0.3, 0.0, 0.0) },  // Rojo oscuro / vino
+            
+            uSoftness: { value: 0.02 },
+
+            // Parámetros de brillo
+            uSpecularColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Brillo blanco
+            uShininess: { value: 32.0 },
+            uSpecularStep: { value: 0.5 }, // Qué tan concentrado es el punto de luz
+            
+            uOutlineThickness: { value: 0.25 }, // Ajusta este número de 0.1 a 0.5 para el grosor
+            uOutlineColor: { value: new THREE.Color('#000000') }, // Tinta negra
+            uTime: { value: 0.0 },
+        }, 
+        side: THREE.FrontSide
+    });
+
+    addModel(name, geometry, material, {
+        type: 'shocktoon',
+        scale: 1,
+        colorObject: '#10047c',
+        velocity: 2.0,
+        frequency: 4.0,
+        amplitude: 2.0,
+        
+        luzX: 0.0,
+        luzY: 0.0,
+        luzZ: 5.0,
+
+        stepHigh: 0.8,
+        stepMid: 0.5,
+        stepLow: 0.2,
+                    
+        colorHigh: '#303df1e8', 
+        colorMid: '#116af0',
+        colorLow: '#03c0f0',
+        
+        softness: 0.02 ,
+        specularColor: '#ffffff', 
+        shininess: 32.0,
+        specularStep: 0.5,
+
+        outlineColor: '#000000',
+        outlineThickness: 0.25
     });
 }

@@ -17,7 +17,7 @@ export function animate(time: number) {
     scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {
             if (child.material instanceof THREE.RawShaderMaterial) {
-                if (child.name === "shockwave") {
+                if (child.name === "shockwave" || child.name === "shocktoon") {
                     child.material.uniforms.uTime.value = time * 0.001;
                 }
             }
