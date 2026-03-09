@@ -38,7 +38,7 @@ void main() {
     }
     vec3 lightDir = normalize(uLightPos - vFragPos);
     vec3 viewDir = normalize(vViewDir);
-    // --- CÁLCULO DE LUZ DIFUSA (Cel Shading) ---
+    // --- CÁLCULO DE LUZ DIFUSA ---
     float diff = max(dot(normal, lightDir), 0.0);
 
     // smoothstep(min, max, valor) crea un difuminado microscópico de 0.02

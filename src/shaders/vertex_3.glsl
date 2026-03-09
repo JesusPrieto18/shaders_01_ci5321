@@ -11,6 +11,7 @@ uniform vec3 uViewPos; // RECIBIMOS LA CÁMARA VIVA
 out vec3 vNormal;
 out vec3 vFragPos; // Posición 3D del píxel para calcular distancias
 out vec3 vViewDir;
+
 void main() {
     // Calculamos la normal directamente desde el modelMatrix (a prueba de fallos)
     vNormal = normalize(mat3(modelMatrix) * normal);
