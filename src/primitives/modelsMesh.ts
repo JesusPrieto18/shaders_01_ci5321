@@ -103,7 +103,7 @@ export class VertexModel extends ModelsMesh<Vertex> {
         (mesh.material as THREE.RawShaderMaterial).uniforms.Smoothness.value = val;
       });
     });
-    deformFolder.add(this.parameters, 'Hardness', 0.0, 2.0).name('Amplitud').onChange((val: any) => {
+    deformFolder.add(this.parameters, 'Hardness', -2.0, 2.0).name('Amplitud').onChange((val: any) => {
       this.forEachMesh(mesh => {
         (mesh.material as THREE.RawShaderMaterial).uniforms.Hardness.value = val;
       });
