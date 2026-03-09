@@ -9,23 +9,16 @@ import { camera } from '../config/config';
 import { addModel } from './modelsMesh';
 import { color } from 'three/tsl';
 
-export function createTriangulo(name: string) {
+export function vertexManipulation(name: string) {
     // Crear geometría
-    const geometry = new THREE.CylinderGeometry(0, 1, 2, 3);
+    const geometry = new THREE.BoxGeometry (1, 1, 1);
     
     // ===== AÑADIR COLORES A LA GEOMETRÍA =====
     // Obtener el número de vértices
     const positionAttribute = geometry.getAttribute('position');
     const vertexCount = positionAttribute.count;
     
-    // Crear array de colores (todos rojos)
-    const colors = [];
-    for (let i = 0; i < vertexCount; i++) {
-        colors.push(1.0, 0.0, 0.0); // Rojo para todos los vértices
-    }
-    
-    // Añadir el atributo 'color' a la geometría
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
     
     // Programa de Shaders
     const material = new THREE.RawShaderMaterial({
@@ -35,6 +28,7 @@ export function createTriangulo(name: string) {
             projectionMatrix: { value: camera.projectionMatrix },
             viewMatrix: { value: camera.matrixWorldInverse },
             modelMatrix: { value: new THREE.Matrix4() },
+            color: { value: new THREE.Color('#ff0000') }, // Color rojo por defecto 
             Smoothness: { value: 0.0 },
             Hardness: { value: 0.0 }
         },
@@ -45,6 +39,7 @@ export function createTriangulo(name: string) {
     addModel(name, geometry, material, {
         type: 'vertex',
         color: '#ff0000',
+        scale: 1,
         Smoothness: 0.0,
         Hardness: 0.0
     });
